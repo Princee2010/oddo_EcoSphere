@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("user") // "user" | "admin"
+  createdAt DateTime @default(now())
+
+  carbonEntries CarbonEntry[]
+  energyEntries EnergyEntry[]
+  waterEntries  WaterEntry[]
+  wasteEntries  WasteEntry[]
+  suppliers     Supplier[]
+  goals         Goal[]
+}
+
+model CarbonEntry {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source        String
+  activityValue Float
+  unit          String
+  co2Equivalent Float
+  date          DateTime @default(now())
+  notes         String?
+  createdAt     DateTime @default(now())
+}
+
+model EnergyEntry {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source      String
+  consumption Float
+  unit        String   @default("kWh")
+  cost        Float?
+  date        DateTime @default(now())
+  notes       String?
+  createdAt   DateTime @default(now())
+}
+
+model WaterEntry {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source      String
+  consumption Float
+  unit        String   @default("liters")
+  cost        Float?
+  date        DateTime @default(now())
+  notes       String?
+  createdAt   DateTime @default(now())
+}
+
+model WasteEntry {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  quantity  Float
+  unit      String   @default("kg")
+  date      DateTime @default(now())
+  notes     String?
+  createdAt DateTime @default(now())
+}
+
+model Supplier {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  category     String?
+  country      String?
+  contactEmail String?
+  esgScore     Float?   @default(0)
+  status       String   @default("active")
+  createdAt    DateTime @default(now())
+}
+
+model Goal {
+  id           String    @id @default(uuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pillar       String
+  title        String
+  targetValue  Float
+  currentValue Float     @default(0)
+  unit         String?
+  deadline     DateTime?
+  status       String    @default("in_progress")
+  createdAt    DateTime  @default(now())
+}
