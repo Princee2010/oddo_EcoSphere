@@ -11,6 +11,9 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
+  LineChart,
+  Line,
+  Legend,
 } from "recharts";
 import axiosClient from "../api/axiosClient";
 import StatCard from "../components/StatCard";
@@ -19,13 +22,19 @@ const PILLAR_COLORS = ["#2F5233", "#C97B4A", "#4C7A52", "#B3452C", "#5B6B5D"];
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState(null);
+  const [trend, setTrend] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    axiosClient
-      .get("/dashboard/summary")
-      .then((res) => setSummary(res.data.data))
+    Promise.all([
+      axiosClient.get("/dashboard/summary"),
+      axiosClient.get("/dashboard/trend?months=6"),
+    ])
+      .then(([summaryRes, trendRes]) => {
+        setSummary(summaryRes.data.data);
+        setTrend(trendRes.data.data || []);
+      })
       .catch((err) => setError(err.response?.data?.message || "Failed to load dashboard"))
       .finally(() => setLoading(false));
   }, []);
@@ -107,6 +116,31 @@ export default function DashboardPage() {
           />
         </Grid>
       </Grid>
+
+      <Paper variant="outlined" sx={{ p: 2, height: 360, mb: 3 }}>
+        <Typography variant="subtitle1" gutterBottom>
+          Resource Usage Trend (last 6 months)
+        </Typography>
+        {trend.every((t) => !t.carbon && !t.energy && !t.water && !t.waste) ? (
+          <Box display="flex" alignItems="center" justifyContent="center" height="80%">
+            <Typography color="text.secondary">No usage data logged yet</Typography>
+          </Box>
+        ) : (
+          <ResponsiveContainer width="100%" height="90%">
+            <LineChart data={trend} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="label" />
+              <YAxis allowDecimals={false} />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="carbon" name="CO2e (kg)" stroke="#2F5233" strokeWidth={2} dot={{ r: 3 }} />
+              <Line type="monotone" dataKey="energy" name="Energy (kWh)" stroke="#C97B4A" strokeWidth={2} dot={{ r: 3 }} />
+              <Line type="monotone" dataKey="water" name="Water (L)" stroke="#4C7A52" strokeWidth={2} dot={{ r: 3 }} />
+              <Line type="monotone" dataKey="waste" name="Waste (kg)" stroke="#B3452C" strokeWidth={2} dot={{ r: 3 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        )}
+      </Paper>
 
       <Grid container spacing={2}>
         <Grid item xs={12} md={6}>

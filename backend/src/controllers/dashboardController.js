@@ -79,4 +79,79 @@ const getSummary = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { getSummary };
+// @route GET /api/dashboard/trend?months=6
+// Groups Carbon/Energy/Water/Waste entries by month so the dashboard can
+// render a resource-usage-over-time line chart.
+const getTrend = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const months = Math.min(parseInt(req.query.months, 10) || 6, 24);
+
+  const since = new Date();
+  since.setMonth(since.getMonth() - (months - 1));
+  since.setDate(1);
+  since.setHours(0, 0, 0, 0);
+
+  const [carbonEntries, energyEntries, waterEntries, wasteEntries] = await Promise.all([
+    CarbonEntry.find({ userId, date: { $gte: since } }),
+    EnergyEntry.find({ userId, date: { $gte: since } }),
+    WaterEntry.find({ userId, date: { $gte: since } }),
+    WasteEntry.find({ userId, date: { $gte: since } }),
+  ]);
+
+  // Build an ordered list of the last N month buckets, e.g. "2026-02"
+  const monthKeys = [];
+  const cursor = new Date(since);
+  for (let i = 0; i < months; i++) {
+    monthKeys.push(`${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, "0")}`);
+    cursor.setMonth(cursor.getMonth() + 1);
+  }
+
+  const monthLabel = (key) => {
+    const [year, month] = key.split("-");
+    return new Date(Number(year), Number(month) - 1, 1).toLocaleDateString("en-US", {
+      month: "short",
+      year: "2-digit",
+    });
+  };
+
+  const buckets = Object.fromEntries(
+    monthKeys.map((key) => [
+      key,
+      { month: key, label: monthLabel(key), carbon: 0, energy: 0, water: 0, waste: 0 },
+    ])
+  );
+
+  const keyOf = (date) => {
+    const d = new Date(date);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  };
+
+  carbonEntries.forEach((e) => {
+    const key = keyOf(e.date);
+    if (buckets[key]) buckets[key].carbon += e.co2Equivalent;
+  });
+  energyEntries.forEach((e) => {
+    const key = keyOf(e.date);
+    if (buckets[key]) buckets[key].energy += e.consumption;
+  });
+  waterEntries.forEach((e) => {
+    const key = keyOf(e.date);
+    if (buckets[key]) buckets[key].water += e.consumption;
+  });
+  wasteEntries.forEach((e) => {
+    const key = keyOf(e.date);
+    if (buckets[key]) buckets[key].waste += e.quantity;
+  });
+
+  const trend = monthKeys.map((key) => ({
+    ...buckets[key],
+    carbon: Math.round(buckets[key].carbon * 100) / 100,
+    energy: Math.round(buckets[key].energy * 100) / 100,
+    water: Math.round(buckets[key].water * 100) / 100,
+    waste: Math.round(buckets[key].waste * 100) / 100,
+  }));
+
+  res.json({ success: true, data: trend });
+});
+
+module.exports = { getSummary, getTrend };

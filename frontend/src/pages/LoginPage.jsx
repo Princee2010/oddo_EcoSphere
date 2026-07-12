@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import axiosClient from "../api/axiosClient";
 import { setCredentials } from "../store/authSlice";
+import logo from "../assets/logo.png";
 
 export default function LoginPage() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -45,6 +46,7 @@ export default function LoginPage() {
       bgcolor="background.default"
     >
       <Paper variant="outlined" sx={{ p: 4, width: 380 }}>
+        <Box component="img" src={logo} alt="EcoSphere" sx={{ width: "100%", maxWidth: 220, display: "block", mb: 2 }} />
         <Typography variant="h5" gutterBottom>
           Sign in to EcoSphere
         </Typography>

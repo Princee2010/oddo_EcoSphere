@@ -1,0 +1,23 @@
+const express = require("express");
+const controller = require("../controllers/auditController");
+const { protect } = require("../middleware/authMiddleware");
+const validate = require("../middleware/validateMiddleware");
+const { auditValidator } = require("../validators/auditValidators");
+const { idParamValidator } = require("../validators/metricValidators");
+
+const router = express.Router();
+
+router.use(protect);
+
+router
+  .route("/")
+  .get(controller.getAll)
+  .post(auditValidator, validate, controller.create);
+
+router
+  .route("/:id")
+  .get(idParamValidator, validate, controller.getOne)
+  .put(idParamValidator, validate, controller.update)
+  .delete(idParamValidator, validate, controller.remove);
+
+module.exports = router;

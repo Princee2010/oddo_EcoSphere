@@ -132,4 +132,39 @@ export const resourceConfigs = {
       },
     ],
   },
+
+  audits: {
+    title: "Audits",
+    endpoint: "/audits",
+    columns: [
+      { key: "title", label: "Title" },
+      { key: "type", label: "Type" },
+      { key: "scope", label: "Scope" },
+      { key: "auditor", label: "Auditor" },
+      { key: "status", label: "Status" },
+      { key: "score", label: "Score" },
+      { key: "date", label: "Date", type: "date" },
+    ],
+    formFields: [
+      { key: "title", label: "Title", type: "text", required: true },
+      {
+        key: "type",
+        label: "Type",
+        type: "select",
+        options: ["internal", "external", "regulatory", "supplier"],
+        required: true,
+      },
+      { key: "scope", label: "Scope", type: "text" },
+      { key: "auditor", label: "Auditor", type: "text" },
+      {
+        key: "status",
+        label: "Status",
+        type: "select",
+        options: ["scheduled", "in_progress", "completed", "failed"],
+      },
+      { key: "score", label: "Score (0-100)", type: "number" },
+      { key: "date", label: "Date", type: "date" },
+      { key: "findings", label: "Findings", type: "text" },
+    ],
+  },
 };

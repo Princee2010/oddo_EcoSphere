@@ -10,6 +10,7 @@ import SuppliersPage from "./pages/SuppliersPage";
 import GoalsPage from "./pages/GoalsPage";
 import DashboardLayout from "./layouts/DashboardLayout";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import AuditsPage from "./pages/AuditsPage";
 
 export default function App() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
         <Route path="/waste" element={<WastePage />} />
         <Route path="/suppliers" element={<SuppliersPage />} />
         <Route path="/goals" element={<GoalsPage />} />
+        <Route path="/audits" element={<AuditsPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

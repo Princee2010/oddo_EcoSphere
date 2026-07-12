@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { List, ListItemButton, ListItemIcon, ListItemText, Box, Typography } from "@mui/material";
+import { List, ListItemButton, ListItemIcon, ListItemText, Box } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/SpaceDashboard";
 import Co2Icon from "@mui/icons-material/Co2";
 import BoltIcon from "@mui/icons-material/Bolt";
@@ -7,6 +7,8 @@ import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import GroupsIcon from "@mui/icons-material/Groups";
 import FlagIcon from "@mui/icons-material/Flag";
+import logo from "../assets/logo.png";
+import FactCheckIcon from "@mui/icons-material/FactCheck";
 
 const navItems = [
   { label: "Dashboard", path: "/dashboard", icon: <DashboardIcon /> },
@@ -16,6 +18,7 @@ const navItems = [
   { label: "Waste", path: "/waste", icon: <DeleteSweepIcon /> },
   { label: "Suppliers", path: "/suppliers", icon: <GroupsIcon /> },
   { label: "Goals", path: "/goals", icon: <FlagIcon /> },
+  { label: "Audits", path: "/audits", icon: <FactCheckIcon /> },
 ];
 
 export default function Sidebar() {
@@ -31,12 +34,7 @@ export default function Sidebar() {
       bgcolor="background.paper"
     >
       <Box p={2.5}>
-        <Typography variant="h6" color="primary.dark" fontWeight={800}>
-          EcoSphere
-        </Typography>
-        <Typography variant="caption" color="text.secondary">
-          ESG Management Platform
-        </Typography>
+        <Box component="img" src={logo} alt="EcoSphere" sx={{ width: "100%", maxWidth: 190, display: "block" }} />
       </Box>
       <List>
         {navItems.map((item) => (
