@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -8,13 +9,14 @@ import WaterPage from "./pages/WaterPage";
 import WastePage from "./pages/WastePage";
 import SuppliersPage from "./pages/SuppliersPage";
 import GoalsPage from "./pages/GoalsPage";
+import AuditsPage from "./pages/AuditsPage";
 import DashboardLayout from "./layouts/DashboardLayout";
 import ProtectedRoute from "./routes/ProtectedRoute";
-import AuditsPage from "./pages/AuditsPage";
 
 export default function App() {
   return (
     <Routes>
+      <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
@@ -35,7 +37,7 @@ export default function App() {
         <Route path="/audits" element={<AuditsPage />} />
       </Route>
 
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
